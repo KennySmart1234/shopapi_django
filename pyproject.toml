@@ -5,8 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "automium-web>=0.1.1",
     "django<6.1",
     "djangorestframework>=3.18.3",
+    "djangorestframework-simplejwt>=5.5.1",
+    "djangorestframework-stubs>=3.18.2",
     "mysqlclient>=2.3.1",
     "psycopg[binary]>=3.3.9",
 ]
