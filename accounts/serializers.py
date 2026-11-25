@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Address
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,3 +19,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data): #used create_user so password is hashed
         return User.objects.create_user(**validated_data)
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        exclude = ['user',]
+        read_only_fields = ['id', 'user']
+

@@ -1,35 +1,27 @@
 from rest_framework import status, permissions
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
+from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.generics import ListAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-import products
-from .serializers import ProductSerializer, CategorySerializer
-from .models import Product, Category
-from rest_framework.mixins import ListModelMixin
+from .serializers import ProductSerializer, CategorySerializer, CartSerializer, ProductReviewSerializer
+from .models import Product, Category, Cart, Review
+
 
 # Create your views here.
 
-# @api_view(['GET'])
-# def product_list(request):
-
-    # products = Product.objects.all().all().filter(is_active=True)
-    # serializer = ProductSerializer(products, many=True)
-    # return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class ProductListView(ListAPIView):
-    queryset = Product.objects.filter(is_active=True)
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all().filter(is_active=True)
     serializer_class = ProductSerializer
-    permission_classes = [AllowAny]
+
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAdminUser()]
 
 
-# class CategoryListView(ListAPIView):
-#     serializer_class = ProductSerializer
-#
-#     def get_queryset(self, slug):
-#         return Category.objects.get(slug=slug)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -41,4 +33,16 @@ def get_product_by_category(request, slug):
 
     except Category.DoesNotExist:
         return Response({"Error": "category not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+class CartViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+    permission_classes = [AllowAny]
+
+
+class ReviewViewSet(ModelViewSet):
+    serializer_class = ProductReviewSerializer
+    queryset = Review.objects.all()
 
