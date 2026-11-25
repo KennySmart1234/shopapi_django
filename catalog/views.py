@@ -1,6 +1,6 @@
 from rest_framework import status, permissions
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -46,3 +46,15 @@ class ReviewViewSet(ModelViewSet):
     serializer_class = ProductReviewSerializer
     queryset = Review.objects.all()
 
+    def get_queryset(self):
+        return Review.objects.filter(product_id=self.kwargs['product_pk'])
+
+
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+
+    def get_serializer_context(self):
+        return {'user': self.request.user, 'product': self.kwargs['product_pk']}

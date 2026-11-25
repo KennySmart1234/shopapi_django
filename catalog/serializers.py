@@ -45,5 +45,11 @@ class CartSerializer(serializers.ModelSerializer):
 class ProductReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        read_only_fields = ['user', 'product']
-        fields = ['rating', 'comment']
+        read_only_fields = ['user', 'product',]
+        fields = ['rating', 'comment', 'product', 'user']
+
+
+    def create(self, validated_data):
+        product_id = self.context['product']
+        user = self.context['user']
+        return Review.objects.create( user=user,product_id=product_id,**validated_data)
